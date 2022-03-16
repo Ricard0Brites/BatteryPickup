@@ -14,4 +14,7 @@ class BATTERYPICKUP_API ABattery_Pickup : public APickup
 {
 	GENERATED_BODY()
 	
+public:
+	//sets the default values for this actor's properties
+	ABattery_Pickup();
 };
