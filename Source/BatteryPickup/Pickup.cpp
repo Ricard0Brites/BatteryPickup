@@ -32,6 +32,10 @@ void APickup::Tick(float DeltaTime)
 
 }
 
+void APickup::WasCollected()
+{
+}
+
 
 //Returns the object state (active(TRUE) or not active(FALSE))
 bool APickup::IsActive()

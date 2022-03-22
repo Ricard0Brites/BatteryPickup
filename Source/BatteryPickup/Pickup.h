@@ -26,6 +26,11 @@ public:
 	/* Return the mesh for the pickup */
 	FORCEINLINE UStaticMeshComponent* GetMesh() const { return pickupMesh; }
 
+	/** Function to call when the pickup is collected */
+	UFUNCTION(BlueprintNativeEvent)
+		void WasCollected();
+
+
 protected:
 	bool bIsActive;
 
