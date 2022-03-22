@@ -7,7 +7,9 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Pickup.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ABatteryPickupCharacter
@@ -45,6 +47,11 @@ ABatteryPickupCharacter::ABatteryPickupCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	// Create the collection sphere
+	CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
+	CollectionSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	CollectionSphere->SetSphereRadius(200.f);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,8 +81,9 @@ void ABatteryPickupCharacter::SetupPlayerInputComponent(class UInputComponent* P
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ABatteryPickupCharacter::OnResetVR);
-}
 
+	PlayerInputComponent->BindAction("Collect", IE_Pressed, this, &ABatteryPickupCharacter::CollectPickups);
+}
 
 void ABatteryPickupCharacter::OnResetVR()
 {
@@ -96,6 +104,27 @@ void ABatteryPickupCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVecto
 void ABatteryPickupCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
 		StopJumping();
+}
+
+void ABatteryPickupCharacter::CollectPickups()
+{
+	// Get all overlapping Actors and store them in an array
+	TArray<AActor*> CollectedActors;
+	CollectionSphere->GetOverlappingActors(CollectedActors);
+	// For each actor we collected
+	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+	{
+		// Cast the actor to APickup
+		APickup* const TestPickup = Cast<APickup>(CollectedActors[iCollected]);
+		// If the cast is successful and the pickup is valid and active
+		if (TestPickup && !TestPickup->IsPendingKill() && TestPickup->IsActive())
+		{
+			// Call the pickup's WasCollected function
+			TestPickup->WasCollected_Implementation();
+			// Deactivate the pickup
+			TestPickup->SetActive(false);
+		}
+	}
 }
 
 void ABatteryPickupCharacter::TurnAtRate(float Rate)

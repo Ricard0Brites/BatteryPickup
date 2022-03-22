@@ -32,11 +32,6 @@ void APickup::Tick(float DeltaTime)
 
 }
 
-void APickup::WasCollected()
-{
-}
-
-
 //Returns the object state (active(TRUE) or not active(FALSE))
 bool APickup::IsActive()
 {
@@ -48,4 +43,9 @@ void APickup::SetActive(bool newPickupState)
 {
 	bIsActive = newPickupState;
 }
-
+void APickup::WasCollected_Implementation()
+{
+	FString PickupDebugString = GetName();
+	UE_LOG(LogClass, Log, TEXT("You have collected %s"), *PickupDebugString);
+	Destroy();
+}
