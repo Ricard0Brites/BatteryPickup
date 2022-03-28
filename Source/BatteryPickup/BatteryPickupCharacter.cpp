@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Battery_Pickup.h"
 #include "Pickup.h"
 
 //////////////////////////////////////////////////////////////////////////
@@ -52,6 +53,10 @@ ABatteryPickupCharacter::ABatteryPickupCharacter()
 	CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
 	CollectionSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	CollectionSphere->SetSphereRadius(200.f);
+
+	// set a base power level for the character
+	InitialPower = 2000.f;
+	CharacterPower = InitialPower;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -106,27 +111,6 @@ void ABatteryPickupCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVecto
 		StopJumping();
 }
 
-void ABatteryPickupCharacter::CollectPickups()
-{
-	// Get all overlapping Actors and store them in an array
-	TArray<AActor*> CollectedActors;
-	CollectionSphere->GetOverlappingActors(CollectedActors);
-	// For each actor we collected
-	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
-	{
-		// Cast the actor to APickup
-		APickup* const TestPickup = Cast<APickup>(CollectedActors[iCollected]);
-		// If the cast is successful and the pickup is valid and active
-		if (TestPickup && !TestPickup->IsPendingKill() && TestPickup->IsActive())
-		{
-			// Call the pickup's WasCollected function
-			TestPickup->WasCollected_Implementation();
-			// Deactivate the pickup
-			TestPickup->SetActive(false);
-		}
-	}
-}
-
 void ABatteryPickupCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
@@ -166,4 +150,55 @@ void ABatteryPickupCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ABatteryPickupCharacter::CollectPickups()
+{
+	// Get all overlapping Actors and store them in an array
+	TArray<AActor*> CollectedActors;
+	CollectionSphere->GetOverlappingActors(CollectedActors);
+
+	//keep track of the collected power
+	float CollectedPower = 0;
+
+	// For each actor we collected
+	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+	{
+		// Cast the actor to APickup
+		APickup* const TestPickup = Cast<APickup>(CollectedActors[iCollected]);
+		// If the cast is successful and the pickup is valid and active
+		if (TestPickup && !TestPickup->IsPendingKill() && TestPickup->IsActive())
+		{
+			// Call the pickup's WasCollected function
+			TestPickup->WasCollected();
+			// Check to see if the pickup is also a battery
+			ABattery_Pickup* const TestBattery = Cast<ABattery_Pickup>(TestPickup);
+			if (TestBattery)
+			{
+				// increase the collected power
+				CollectedPower += TestBattery->GetPower();
+			}
+			// Deactivate the pickup
+			TestPickup->SetActive(false);
+		}
+	}
+	if (CollectedPower > 0)
+	{
+		UpdatePower(CollectedPower);
+	}
+}
+
+float ABatteryPickupCharacter::GetInitialPower()
+{
+	return InitialPower;
+}
+
+float ABatteryPickupCharacter::GetCurrentPower()
+{
+	return CharacterPower;
+}
+
+void ABatteryPickupCharacter::UpdatePower(float PowerChange)
+{
+	CharacterPower += PowerChange;
 }

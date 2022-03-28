@@ -77,5 +77,31 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	/** Return CollectionSphere subobject **/
 	FORCEINLINE class USphereComponent* GetCollectionSphere() const {return CollectionSphere;}
+
+protected:
+	/** The starting power level of our character */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
+		float InitialPower;
+
+	/** Accessor function for initial power */
+	UFUNCTION(BlueprintPure, Category = "Battery Pickup")
+		float GetInitialPower();
+	/** Accessor function for current power */
+	UFUNCTION(BlueprintPure, Category = "Battery Pickup")
+		float GetCurrentPower();
+	/**
+	Function to update the character's power
+	* @param PowerChange This is the amount to change the power by, and it can be positive or negative.
+	*/
+	UFUNCTION(BlueprintCallable, Category = "Power")
+		void UpdatePower(float PowerChange);
+
+
+private:
+	/** Current power level of our character */
+	UPROPERTY(VisibleAnywhere, Category = "Power")
+		float CharacterPower;
+
+
 };
 

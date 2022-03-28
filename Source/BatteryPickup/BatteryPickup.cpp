@@ -19,11 +19,3 @@ void ABatteryPickup::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-
-void ABatteryPickup::WasCollected_Implementation()
-{
-	// Use the base pickup behavior
-	Super::WasCollected_Implementation();
-	// Destroy the battery	
-	Destroy();
-}

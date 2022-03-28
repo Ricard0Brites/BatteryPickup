@@ -21,7 +21,4 @@ protected:
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	/** Override the WasCollected function - use Implementation because it's a Blueprint Native Event */
-	void WasCollected_Implementation() override;
 };
