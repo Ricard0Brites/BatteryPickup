@@ -13,6 +13,13 @@ class ABatteryPickupGameMode : public AGameModeBase
 
 public:
 	ABatteryPickupGameMode();
+
+	virtual void Tick(float DeltaTime) override;
+
+protected:
+	/** The rate at which the character loses power */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = true))
+		float DecayRate;
 };
 
 

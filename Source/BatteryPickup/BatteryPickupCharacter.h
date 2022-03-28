@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Runtime/Engine/Classes/Engine/Blueprint.h"
 #include "BatteryPickupCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -80,9 +81,17 @@ public:
 
 protected:
 	/** The starting power level of our character */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Power", Meta = (BlueprintProtected = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battery Pickup", Meta = (BlueprintProtected = "true"))
 		float InitialPower;
-
+	/** Multiplier for character speed */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battery Pickup", Meta = (BlueprintProtected = "true"))
+		float SpeedFactor;
+	/** Speed when power level = 0 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Battery Pickup", Meta = (BlueprintProtected = "true"))
+		float BaseSpeed;
+	UFUNCTION(BlueprintImplementableEvent, Category = "Battery Pickup")
+		void PowerChangeEffect();
+public:
 	/** Accessor function for initial power */
 	UFUNCTION(BlueprintPure, Category = "Battery Pickup")
 		float GetInitialPower();
@@ -93,13 +102,13 @@ protected:
 	Function to update the character's power
 	* @param PowerChange This is the amount to change the power by, and it can be positive or negative.
 	*/
-	UFUNCTION(BlueprintCallable, Category = "Power")
+	UFUNCTION(BlueprintCallable, Category = "Battery Pickup")
 		void UpdatePower(float PowerChange);
 
 
 private:
 	/** Current power level of our character */
-	UPROPERTY(VisibleAnywhere, Category = "Power")
+	UPROPERTY(VisibleAnywhere, Category = "Battery Pickup")
 		float CharacterPower;
 
 

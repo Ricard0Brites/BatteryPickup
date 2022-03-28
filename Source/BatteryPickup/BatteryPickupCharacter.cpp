@@ -57,6 +57,9 @@ ABatteryPickupCharacter::ABatteryPickupCharacter()
 	// set a base power level for the character
 	InitialPower = 2000.f;
 	CharacterPower = InitialPower;
+	// set the dependence of the speed on the power level
+	SpeedFactor = 0.75f;
+	BaseSpeed = 10.f;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -200,5 +203,11 @@ float ABatteryPickupCharacter::GetCurrentPower()
 
 void ABatteryPickupCharacter::UpdatePower(float PowerChange)
 {
+	//set the base speed
 	CharacterPower += PowerChange;
+	// change speed based on power
+	GetCharacterMovement()->MaxWalkSpeed = BaseSpeed + SpeedFactor * CharacterPower;
+	// call visual effect
+	PowerChangeEffect();
 }
+
